@@ -1,58 +1,100 @@
 package bq.provider;
 
-import java.time.Instant;
+import bq.DataManager;
+import bq.OHLCV;
+import bx.sql.duckdb.DuckTable;
+import bx.util.Zones;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import java.time.LocalDate;
 import java.util.stream.Stream;
-
-import com.google.common.base.Optional;
-
-import bq.OHLCV;
-import bx.util.Zones;
+import javax.sql.DataSource;
 
 public abstract class DataProvider {
 
-	
-	public class Request {
-		LocalDate from;
-		LocalDate to;		
-		String symbol;
-		
-		
-		public Optional<LocalDate> getFrom() {
-			return Optional.of(from);
-		}
-		
-		public Optional<LocalDate> getTo() {
-			return Optional.of(to);
-		}
-		
-		public Request from(LocalDate date) {
-			this.from = date;
-			return this;
-		}
-		
-		
-		public Request to(LocalDate date) {
-		
-			this.to = date;
-			return this;
-		}
-	
-		
-		public Request symbol(String symbol) {
-			this.symbol = symbol;
-			return this;
-		}
-		
-		public Stream<OHLCV> stream() {
-			return fetch(this);
-		}
-	}
-	
-	public Request newRequest() {
-		Request r = new Request();
-		
-		return r;
-	}
-	protected abstract Stream<OHLCV> fetch(Request request);
+  DataSource dataSource;
+
+  public class Request {
+    LocalDate from;
+    LocalDate to;
+    String symbol;
+
+    public Optional<LocalDate> getFrom() {
+      return Optional.of(from);
+    }
+
+    public Optional<LocalDate> getTo() {
+      return Optional.of(to);
+    }
+
+    public Request fromDaysAgo(int count) {
+      return from(LocalDate.now(Zones.UTC).minusDays(count));
+    }
+
+    public Request toDaysAgo(int count) {
+      return to(LocalDate.now(Zones.UTC).minusDays(count));
+    }
+
+    public Request from(int year, int month, int day) {
+      return from(LocalDate.of(year, month, day));
+    }
+
+    public Request to(int year, int month, int day) {
+      return to(LocalDate.of(year, month, day));
+    }
+
+    public Request from(LocalDate date) {
+      this.from = date;
+      return this;
+    }
+
+    public Request to(LocalDate date) {
+
+      this.to = date;
+      return this;
+    }
+
+    Request symbol(String symbol) {
+      this.symbol = symbol;
+      return this;
+    }
+
+    public Stream<OHLCV> fetchStream() {
+      return fetch(this);
+    }
+
+    public DuckTable fetchIntoTable() {
+      String tableName = String.format("temp_%s", System.currentTimeMillis());
+
+      DataManager ddm = new DataManager().dataSource(dataSource);
+
+      var table = ddm.createOHLCV(tableName, true);
+
+      return fetchIntoTable(table.getTableName());
+    }
+
+    public DuckTable fetchIntoTable(String table) {
+      Preconditions.checkState(DataProvider.this.dataSource != null, "dataSource must be set");
+      DataManager ddm = new DataManager().dataSource(dataSource);
+      ddm.insert(table, fetchStream().toList());
+      return DuckTable.of(dataSource, table);
+    }
+  }
+
+  public DataProvider dataSource(DataSource ds) {
+    this.dataSource = ds;
+    return this;
+  }
+
+  public Request forSymbol(String symbol) {
+    return newRequest().symbol(symbol);
+  }
+
+  private Request newRequest() {
+    Request r = new Request();
+
+    return r;
+  }
+
+  protected abstract Stream<OHLCV> fetch(Request request);
 }
