@@ -66,6 +66,7 @@ public abstract class DataProvider {
     public DuckTable fetchIntoTable() {
       String tableName = String.format("temp_%s", System.currentTimeMillis());
 
+      Preconditions.checkState(dataSource!=null,"DataSource must be set");
       DataManager ddm = new DataManager().dataSource(dataSource);
 
       var table = ddm.createOHLCV(tableName, true);
@@ -81,9 +82,11 @@ public abstract class DataProvider {
     }
   }
 
-  public DataProvider dataSource(DataSource ds) {
+  
+  
+  public <T extends DataProvider> T dataSource(DataSource ds) {
     this.dataSource = ds;
-    return this;
+    return (T) this;
   }
 
   public Request forSymbol(String symbol) {

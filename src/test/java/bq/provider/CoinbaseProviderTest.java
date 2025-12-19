@@ -12,16 +12,15 @@ public class CoinbaseProviderTest extends BqTest {
   void testId() {
 
     CoinbaseDataProvider cb = new CoinbaseDataProvider();
-
-    cb.forSymbol("btc")
-        .from(LocalDate.of(2025, 12, 1))
+var t=
+    cb.dataSource(getDataSource()).forSymbol("btc")
+        .from(LocalDate.of(2017, 12, 1))
         .to(LocalDate.of(2025, 12, 7))
-        .fetchStream()
-        .toList()
-        .forEach(
-            it -> {
-              System.out.println(it);
-            });
+        .fetchIntoTable();
+    
+    t.prettyQuery().select();
+    
+       
   }
 
   @Test
@@ -35,7 +34,7 @@ public class CoinbaseProviderTest extends BqTest {
             .from(LocalDate.of(2025, 12, 1))
             .fetchIntoTable("test");
 
-    t.selectPretty(System.out);
+    t.prettyQuery().select();
   }
 
   @Test
@@ -49,7 +48,7 @@ public class CoinbaseProviderTest extends BqTest {
             .from(LocalDate.of(2025, 12, 1))
             .fetchIntoTable();
 
-    t.selectPretty(System.out);
+    t.prettyQuery().select();
   }
 
   @Test

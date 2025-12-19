@@ -1,18 +1,23 @@
 package bq;
 
+import bx.sql.PrettyQuery;
 import bx.sql.duckdb.DuckDataSource;
 import bx.sql.duckdb.DuckTable;
+import bx.util.S;
 import bx.util.Slogger;
 import java.io.File;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.springframework.jdbc.core.simple.JdbcClient;
+
+import com.google.common.base.Preconditions;
 
 public abstract class BqTest {
 
-  Logger logger = Slogger.forEnclosingClass();
+  static Logger logger = Slogger.forEnclosingClass();
 
   private DuckDataSource dataSource;
   DataManager ddm;
@@ -29,6 +34,9 @@ public abstract class BqTest {
     return JdbcClient.create(getDataSource());
   }
 
+  public PrettyQuery prettyQuery() {
+	  return PrettyQuery.with(getDataSource()).out(logger,Level.INFO);
+  }
   public DuckTable loadBtcPriceData(String table) {
 
     getDuckDataManager().createOHLCV(table, true);
@@ -40,7 +48,7 @@ public abstract class BqTest {
 
     int count = getJdbcClient().sql(sql).update();
 
-    logger.atInfo().log("inserted {} rows", count);
+    logger.atDebug().log("inserted {} rows", count);
 
     return DuckTable.of(getDataSource(), table);
   }
@@ -48,7 +56,13 @@ public abstract class BqTest {
   @BeforeEach
   public void setup() {
 
-    logger.atInfo().log("setup");
+	String name = System.getProperty("app.name");
+	if (!S.notBlank(name).orElse("").equals("bq")) {
+		System.setProperty("app.name", "bq");
+		name = System.getProperty("app.name");
+		Preconditions.checkState(S.notBlank(name).orElse("").equals("bq"));
+	}
+    logger.atTrace().log("setup");
     dataSource = DuckDataSource.createInMemory();
 
     ddm = new DataManager();
@@ -57,7 +71,7 @@ public abstract class BqTest {
 
   @AfterEach
   public void tearDown() {
-    logger.atInfo().log("closing: " + dataSource);
+    logger.atTrace().log("closing: " + dataSource);
     dataSource.close();
   }
 }

@@ -2,6 +2,7 @@ package bq.provider;
 
 import bq.BasicOHLCV;
 import bq.OHLCV;
+import bx.util.HttpResponseException;
 import bx.util.Json;
 import bx.util.S;
 import bx.util.Slogger;
@@ -17,15 +18,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import kong.unirest.core.HttpResponse;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import tools.jackson.databind.JsonNode;
 
 public class CoinbaseDataProvider extends DataProvider {
 
-  Logger logger = Slogger.forEnclosingClass();
+  static Logger logger = Slogger.forEnclosingClass();
   RateLimiter limit = RateLimiter.create(1.5);
 
+  public static final int MAX_PAGE_SIZE=350;
+  int pageSize=MAX_PAGE_SIZE;
   public LocalDate getLastClosedTradingDay() {
     return LocalDate.now(Zones.UTC).minusDays(1);
   }
@@ -79,9 +84,13 @@ public class CoinbaseDataProvider extends DataProvider {
             product, t0, t1);
     logger.atInfo().log("GET {}", url);
 
-    JsonNode n = Unirest.get(url).asObject(JsonNode.class).getBody();
-
-    return n;
+    HttpResponse<JsonNode> response = Unirest.get(url).asObject(JsonNode.class);
+    if (!response.isSuccess()) {
+    	throw new HttpResponseException(response.getStatus());
+    }
+    
+    return response.getBody();
+  
   }
 
   public static OHLCV toOHLCV(JsonNode n) {
@@ -122,7 +131,7 @@ public class CoinbaseDataProvider extends DataProvider {
   @Override
   public Stream<OHLCV> fetch(Request request) {
 
-    logger.atInfo().log(
+    logger.atTrace().log(
         "symbol={} from={} to={}", toCoinbaseSymbol(request.symbol), request.from, request.to);
 
     if (request.from != null && request.to != null) {
@@ -139,26 +148,26 @@ public class CoinbaseDataProvider extends DataProvider {
       notAfter = ZonedDateTime.now(Zones.UTC).toLocalDate();
     }
 
-    logger.atInfo().log("start at {}", notAfter);
+    logger.atTrace().log("start at {}", notAfter);
 
     List<OHLCV> results = Lists.newLinkedList();
 
     LocalDate ref = notAfter;
-    int REQUEST_MAX = 350;
+   
     int responseSize = 0;
     do {
 
       long requestCount = 0;
       if (notBefore == null) {
-        requestCount = REQUEST_MAX;
+        requestCount = pageSize;
       } else {
         requestCount = notBefore.until(notAfter, ChronoUnit.DAYS);
       }
 
-      requestCount = Math.min(REQUEST_MAX, Math.abs(requestCount));
+      requestCount = Math.min(pageSize, Math.abs(requestCount));
 
       JsonNode n = loadJson(toCoinbaseSymbol(request.symbol), ref, requestCount * -1);
-      logger.atInfo().log("from={} count={}", ref, requestCount * -1);
+      logger.atTrace().log("from={} count={}", ref, requestCount * -1);
       responseSize = n.path("candles").size();
 
       for (OHLCV it :
@@ -172,7 +181,7 @@ public class CoinbaseDataProvider extends DataProvider {
       }
 
       ref = ref.minus(1, ChronoUnit.DAYS);
-      logger.atInfo().log("response size " + responseSize);
+      logger.atTrace().log("response size " + responseSize);
     } while (responseSize > 0 && (notBefore == null || ref.isAfter(notBefore)));
     return results.reversed().stream();
   }
