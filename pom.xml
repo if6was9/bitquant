@@ -32,12 +32,14 @@
 		<dependency>
 			<groupId>io.github.if6was9</groupId>
 			<artifactId>bx</artifactId>
+
 			<version>0.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
 			<version>4.8.184</version>
+
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

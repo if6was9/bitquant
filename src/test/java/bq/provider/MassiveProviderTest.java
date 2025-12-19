@@ -1,5 +1,6 @@
 package bq.provider;
 
+
 import bq.BqTest;
 import bx.sql.duckdb.DuckTable;
 import java.time.LocalDate;
@@ -32,4 +33,9 @@ public class MassiveProviderTest extends BqTest {
     Assertions.assertThat(list.get(0).getDate()).isEqualTo(from);
     Assertions.assertThat(list.get(7).getDate()).isEqualTo(to);
   }
+
+
+	
+	
+
 }
