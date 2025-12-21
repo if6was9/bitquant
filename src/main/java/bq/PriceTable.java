@@ -3,6 +3,7 @@ package bq;
 import bq.ta4j.BarSeriesIterator;
 import bq.ta4j.Bars;
 import bq.ta4j.IndexedBar;
+import bq.ta4j.IndicatorBuilder;
 import bx.sql.Results;
 import bx.sql.duckdb.DuckTable;
 import bx.util.Dates;

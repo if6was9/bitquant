@@ -2,6 +2,7 @@ package bq.ta4j;
 
 import bq.BasicOHLCV;
 import bq.OHLCV;
+import bx.util.Item;
 import bx.util.Iterators;
 import bx.util.Zones;
 import java.time.Duration;
@@ -17,6 +18,8 @@ import org.ta4j.core.BarSeries;
 import org.ta4j.core.BarSeriesBuilder;
 import org.ta4j.core.BaseBarSeriesBuilder;
 import org.ta4j.core.num.DoubleNumFactory;
+
+import com.google.common.collect.Lists;
 
 public class Bars {
 
@@ -126,5 +129,23 @@ public class Bars {
   public static Stream<Bar> toStream(BarSeries series) {
 
     return Iterators.toStream(toIterator(series));
+  }
+  
+
+
+  /**
+   * TA4J BarSeries indexes are unusual *AND* necessary to use indicators.
+   * Using the Item<Bar> construct makes it easy to iterate across a bar series and,
+   * for example, get Indicator values.
+   * @param barSeries
+   * @return
+   */
+  public static List<Item<Bar>> toIndexedList(BarSeries barSeries) {
+
+    List<Item<Bar>> items = Lists.newArrayList();
+    for (int i = barSeries.getBeginIndex(); i <= barSeries.getEndIndex(); i++) {
+      items.add(Item.of(barSeries.getBar(i), i));
+    }
+    return List.copyOf(items);
   }
 }

@@ -1,4 +1,4 @@
-package bq;
+package bq.ta4j;
 
 import bx.util.BxException;
 import bx.util.Json;
