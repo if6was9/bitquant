@@ -17,12 +17,12 @@ public class DataManagerTest extends BqTest {
   public void testIt() {
     getDuckDataManager().createOHLCV("test", false);
 
-    DuckTable.of(getDataSource(), "test").selectPretty(System.out);
+    DuckTable.of(getDataSource(), "test").prettyQuery().select();
 
     var ohlcv = BasicOHLCV.of(LocalDate.of(2025, 11, 11), 10.0, 11.0, 6.0, 9.0, 100.0);
     getDuckDataManager().insert("test", List.of(ohlcv));
 
-    DuckTable.of(getDataSource(), "test").selectPretty(System.out);
+    DuckTable.of(getDataSource(), "test").prettyQuery().select();
   }
 
   @Test
@@ -59,6 +59,6 @@ public class DataManagerTest extends BqTest {
 
     Assertions.assertThat(table.rowCount()).isEqualTo(3);
 
-    table.selectPretty(System.out);
+    table.prettyQuery().select();
   }
 }

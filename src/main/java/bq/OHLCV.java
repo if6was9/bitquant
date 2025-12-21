@@ -5,54 +5,31 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public interface OHLCV {
+public interface OHLCV extends Comparable {
 
   LocalDate getDate();
 
   Instant getTimestamp();
 
-  Optional<BigDecimal> getOpen();
+  public Optional<BigDecimal> getOpenAsDecimal();
 
-  Optional<BigDecimal> getHigh();
+  public Optional<BigDecimal> getHighAsDecimal();
 
-  Optional<BigDecimal> getLow();
+  public Optional<BigDecimal> getLowAsDecimal();
 
-  Optional<BigDecimal> getClose();
+  public Optional<BigDecimal> getCloseAsDecimal();
 
-  Optional<BigDecimal> getVolume();
+  public Optional<BigDecimal> getVolumeAsDecimal();
 
-  default Optional<Double> optDouble(Optional<BigDecimal> bd) {
-    if (bd == null) {
-      return Optional.empty();
-    }
-    if (bd.isPresent()) {
-      return Optional.of(bd.get().doubleValue());
-    }
-    return Optional.empty();
-  }
+  Optional<Long> getId();
 
-  public default Optional<Double> getOpenAsDouble() {
+  public Optional<Double> getOpen();
 
-    return optDouble(getOpen());
-  }
+  public Optional<Double> getHigh();
 
-  public default Optional<Double> getHighAsDouble() {
+  public Optional<Double> getLow();
 
-    return optDouble(getHigh());
-  }
+  public Optional<Double> getClose();
 
-  public default Optional<Double> getLowAsDouble() {
-
-    return optDouble(getLow());
-  }
-
-  public default Optional<Double> getCloseAsDouble() {
-
-    return optDouble(getClose());
-  }
-
-  public default Optional<Double> getVolumeAsDouble() {
-
-    return optDouble(getVolume());
-  }
+  public Optional<Double> getVolume();
 }

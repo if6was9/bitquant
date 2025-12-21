@@ -1,6 +1,7 @@
 package bq.provider;
 
 import bq.BqTest;
+import bq.ta4j.Bars;
 import bx.util.Zones;
 import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
@@ -9,19 +10,52 @@ import org.junit.jupiter.api.Test;
 public class CoinbaseProviderTest extends BqTest {
 
   @Test
-  void testId() {
-
+  public void testX() {
     CoinbaseDataProvider cb = new CoinbaseDataProvider();
+    var t =
+        cb.dataSource(getDataSource())
+            .forSymbol("btc")
+            .from(LocalDate.of(2025, 12, 1))
+            .to(LocalDate.of(2025, 12, 7));
 
-    cb.forSymbol("btc")
-        .from(LocalDate.of(2025, 12, 1))
-        .to(LocalDate.of(2025, 12, 7))
-        .fetchStream()
-        .toList()
+    t.fetchStream()
         .forEach(
             it -> {
               System.out.println(it);
             });
+    Bars.toIterator(t.fetchBarSeries())
+        .forEachRemaining(
+            it -> {
+              System.out.println(it);
+            });
+  }
+
+  @Test
+  void testId() {
+
+    CoinbaseDataProvider cb = new CoinbaseDataProvider();
+    var t =
+        cb.dataSource(getDataSource())
+            .forSymbol("btc")
+            .from(LocalDate.of(2017, 12, 1))
+            .to(LocalDate.of(2025, 12, 7))
+            .fetchIntoTable();
+
+    t.prettyQuery().select();
+  }
+
+  @Test
+  void testFetchBarSeries() {
+
+    CoinbaseDataProvider cb = new CoinbaseDataProvider();
+    var t =
+        cb.dataSource(getDataSource())
+            .forSymbol("btc")
+            .from(LocalDate.of(2025, 12, 1))
+            .to(LocalDate.of(2025, 12, 7))
+            .fetchBarSeries();
+
+    System.out.println(t);
   }
 
   @Test
@@ -35,7 +69,7 @@ public class CoinbaseProviderTest extends BqTest {
             .from(LocalDate.of(2025, 12, 1))
             .fetchIntoTable("test");
 
-    t.selectPretty(System.out);
+    t.prettyQuery().select();
   }
 
   @Test
@@ -49,7 +83,7 @@ public class CoinbaseProviderTest extends BqTest {
             .from(LocalDate.of(2025, 12, 1))
             .fetchIntoTable();
 
-    t.selectPretty(System.out);
+    t.prettyQuery().select();
   }
 
   @Test

@@ -1,5 +1,6 @@
 package bq;
 
+
 import bx.util.Zones;
 import com.google.common.base.MoreObjects;
 import java.math.BigDecimal;
@@ -7,53 +8,115 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
 
+
 public class BasicOHLCV implements OHLCV {
 
   Instant ts;
-  BigDecimal open;
-  BigDecimal high;
-  BigDecimal low;
-  BigDecimal close;
-  BigDecimal volume;
+  Double open;
+  Double high;
+  Double low;
+  Double close;
+  Double volume;
+  Long id;
 
   public static OHLCV of(
-      LocalDate t, Double open, Double high, Double low, Double close, Double vol) {
-    return of(
-        t.atStartOfDay(Zones.UTC).toInstant(),
-        open != null ? new BigDecimal(open.toString()) : null,
-        high != null ? new BigDecimal(high.toString()) : null,
-        low != null ? new BigDecimal(low.toString()) : null,
-        close != null ? new BigDecimal(close.toString()) : null,
-        vol != null ? new BigDecimal(vol.toString()) : null);
+      LocalDate t, Double open, Double high, Double low, Double close, Double vol, Long id) {
+    return of(t.atStartOfDay(Zones.UTC).toInstant(), open, high, low, close, vol, id);
   }
 
   public static OHLCV of(
+      LocalDate t, Double open, Double high, Double low, Double close, Double vol) {
+
+    return of(t, open, high, low, close, vol, null);
+  }
+
+  public static OHLCV of(
+      Instant t, Double open, Double high, Double low, Double close, Double vol) {
+    return of(t, open, high, low, close, vol, null);
+  }
+
+  public static OHLCV of(
+      Instant t, Double open, Double high, Double low, Double close, Double vol, Long id) {
+
+    var bar = new BasicOHLCV();
+    bar.ts = t;
+    bar.open = open;
+    bar.high = high;
+    bar.low = low;
+    bar.close = close;
+    bar.volume = vol;
+    bar.id = id;
+    return bar;
+  }
+
+  public static OHLCV ofDecimal(
       LocalDate t,
       BigDecimal open,
       BigDecimal high,
       BigDecimal low,
       BigDecimal close,
       BigDecimal vol) {
-    return of(t.atStartOfDay(Zones.UTC).toInstant(), open, high, low, close, vol);
+    return ofDecimal(t.atStartOfDay(Zones.UTC).toInstant(), open, high, low, close, vol, null);
   }
 
-  public static OHLCV of(
+  public static OHLCV ofDecimal(
+      LocalDate t,
+      BigDecimal open,
+      BigDecimal high,
+      BigDecimal low,
+      BigDecimal close,
+      BigDecimal vol,
+      Long id) {
+    return ofDecimal(t.atStartOfDay(Zones.UTC).toInstant(), open, high, low, close, vol, id);
+  }
+
+  public static OHLCV ofDecimal(
       Instant t,
       BigDecimal open,
       BigDecimal high,
       BigDecimal low,
       BigDecimal close,
       BigDecimal volume) {
-    BasicOHLCV b = new BasicOHLCV();
+    return ofDecimal(t, open, high, low, close, volume, null);
+  }
 
-    b.ts = t;
-    b.open = open;
-    b.high = high;
-    b.low = low;
-    b.close = close;
-    b.volume = volume;
+  public static OHLCV ofDecimal(
+      Instant t,
+      BigDecimal open,
+      BigDecimal high,
+      BigDecimal low,
+      BigDecimal close,
+      BigDecimal volume,
+      Long id) {
 
-    return b;
+    return BasicOHLCV.of(
+        t,
+        open != null ? open.doubleValue() : null,
+        high != null ? high.doubleValue() : null,
+        low != null ? low.doubleValue() : null,
+        close != null ? close.doubleValue() : null,
+        volume != null ? volume.doubleValue() : null,
+        id);
+  }
+
+  public Optional<BigDecimal> getOpenAsDecimal() {
+    return optDecimal(getOpen());
+  }
+
+  public Optional<BigDecimal> getHighAsDecimal() {
+    return optDecimal(getHigh());
+  }
+
+  public Optional<BigDecimal> getLowAsDecimal() {
+    return optDecimal(getLow());
+  }
+
+  public Optional<BigDecimal> getCloseAsDecimal() {
+    return optDecimal(getClose());
+  }
+
+  public Optional<BigDecimal> getVolumeAsDecimal() {
+    return optDecimal(getVolume());
   }
 
   public LocalDate getDate() {
@@ -66,26 +129,26 @@ public class BasicOHLCV implements OHLCV {
   }
 
   @Override
-  public Optional<BigDecimal> getOpen() {
+  public Optional<Double> getOpen() {
     return Optional.ofNullable(open);
   }
 
   @Override
-  public Optional<BigDecimal> getHigh() {
+  public Optional<Double> getHigh() {
     return Optional.ofNullable(high);
   }
 
   @Override
-  public Optional<BigDecimal> getLow() {
+  public Optional<Double> getLow() {
     return Optional.ofNullable(low);
   }
 
   @Override
-  public Optional<BigDecimal> getVolume() {
+  public Optional<Double> getVolume() {
     return Optional.ofNullable(volume);
   }
 
-  public Optional<BigDecimal> getClose() {
+  public Optional<Double> getClose() {
     return Optional.ofNullable(close);
   }
 
@@ -98,13 +161,46 @@ public class BasicOHLCV implements OHLCV {
     } else {
       datePart = ts.toString();
     }
-    return MoreObjects.toStringHelper("OLHCV")
-        .add("date", datePart)
-        .add("o", getOpen().orElse(null))
-        .add("h", getHigh().orElse(null))
-        .add("l", getLow().orElse(null))
-        .add("c", getClose().orElse(null))
-        .add("v", getVolume().orElse(null))
-        .toString();
+    var h =
+        MoreObjects.toStringHelper("OLHCV")
+            .add("date", datePart)
+            .add("open", getOpenAsDecimal().orElse(null))
+            .add("high", getHighAsDecimal().orElse(null))
+            .add("low", getLowAsDecimal().orElse(null))
+            .add("close", getCloseAsDecimal().orElse(null))
+            .add("volume", getVolumeAsDecimal().orElse(null));
+
+    getId()
+        .ifPresent(
+            id -> {
+              h.add("id", id);
+            });
+    return h.toString();
   }
+
+  public Optional<Long> getId() {
+    return Optional.ofNullable(id);
+  }
+
+  @Override
+  public int compareTo(Object o) {
+    if (o == null || (!(o instanceof OHLCV))) {
+      return 1;
+    }
+
+    OHLCV other = (OHLCV) o;
+    return ts.compareTo(other.getTimestamp());
+  }
+
+  Optional<BigDecimal> optDecimal(Optional<Double> d) {
+    if (d == null) {
+      return Optional.empty();
+    }
+    if (d.isPresent()) {
+      return Optional.of(BigDecimal.valueOf(d.get()));
+    }
+    return Optional.empty();
+  }
+
+ 
 }
