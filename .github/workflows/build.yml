@@ -29,6 +29,8 @@ jobs:
           
       
       - name: Build 
+        env:
+          MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
         run: |
           ./build.sh
           
