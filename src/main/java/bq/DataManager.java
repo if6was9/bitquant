@@ -76,7 +76,7 @@ CREATE TABLE %s (date date not null, open double null, high double null, low dou
       r.getDouble("volume");
 
       var ohlcv =
-          BasicOHLCV.of(
+          BasicOHLCV.ofDecimal(
               date.atStartOfDay(Zones.UTC).toInstant(),
               r.getBigDecimal("open").orElse(null),
               r.getBigDecimal("high").orElse(null),
@@ -142,11 +142,11 @@ CREATE TABLE %s (date date not null, open double null, high double null, low dou
                 try {
 
                   ps.setString(1, it.getDate().toString()); // do not use date type
-                  ps.setDouble(2, it.getOpenAsDouble().orElse(null));
-                  ps.setDouble(3, it.getHighAsDouble().orElse(null));
-                  ps.setDouble(4, it.getLowAsDouble().orElse(null));
-                  ps.setDouble(5, it.getCloseAsDouble().orElse(null));
-                  ps.setDouble(6, it.getVolumeAsDouble().orElse(null));
+                  ps.setDouble(2, it.getOpen().orElse(null));
+                  ps.setDouble(3, it.getHigh().orElse(null));
+                  ps.setDouble(4, it.getLow().orElse(null));
+                  ps.setDouble(5, it.getClose().orElse(null));
+                  ps.setDouble(6, it.getVolume().orElse(null));
                   ps.executeUpdate();
                 } catch (SQLException e) {
                   throw new DbException(e);
@@ -172,20 +172,26 @@ CREATE TABLE %s (date date not null, open double null, high double null, low dou
           Timestamp ts = Timestamp.from(Instant.now());
 
           appender.append(ts);
-          appender.append(candle.getOpenAsDouble().orElse(null));
+          appender.append(candle.getOpen().orElse(null));
           appender.append(
               (Double)
-                  ((candle.getHigh().isPresent()) ? candle.getHigh().get().doubleValue() : null));
+                  ((candle.getHighAsDecimal().isPresent())
+                      ? candle.getHighAsDecimal().get().doubleValue()
+                      : null));
           appender.append(
               (Double)
-                  ((candle.getLow().isPresent()) ? candle.getLow().get().doubleValue() : null));
+                  ((candle.getLowAsDecimal().isPresent())
+                      ? candle.getLowAsDecimal().get().doubleValue()
+                      : null));
           appender.append(
               (Double)
-                  ((candle.getClose().isPresent()) ? candle.getClose().get().doubleValue() : null));
+                  ((candle.getCloseAsDecimal().isPresent())
+                      ? candle.getCloseAsDecimal().get().doubleValue()
+                      : null));
           appender.append(
               (Double)
-                  ((candle.getVolume().isPresent())
-                      ? candle.getVolume().get().doubleValue()
+                  ((candle.getVolumeAsDecimal().isPresent())
+                      ? candle.getVolumeAsDecimal().get().doubleValue()
                       : null));
 
           appender.endRow();

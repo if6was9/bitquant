@@ -1,5 +1,6 @@
 package bq.ta4j;
 
+import bq.BasicOHLCV;
 import bq.OHLCV;
 import bx.util.Iterators;
 import bx.util.Zones;
@@ -85,12 +86,22 @@ public class Bars {
         Duration.ofDays(1),
         ohlcv.getTimestamp(),
         null,
-        ohlcv.getOpenAsDouble().orElse(null),
-        ohlcv.getHighAsDouble().orElse(null),
-        ohlcv.getLowAsDouble().orElse(null),
-        ohlcv.getCloseAsDouble().orElse(null),
-        ohlcv.getVolumeAsDouble().orElse(null),
+        ohlcv.getOpen().orElse(null),
+        ohlcv.getHigh().orElse(null),
+        ohlcv.getLow().orElse(null),
+        ohlcv.getClose().orElse(null),
+        ohlcv.getVolume().orElse(null),
         ohlcv.getId().orElse(null));
+  }
+
+  public static OHLCV toOHLCV(Bar b) {
+    return BasicOHLCV.of(
+        b.getBeginTime(),
+        b.getOpenPrice() != null ? b.getOpenPrice().doubleValue() : null,
+        b.getHighPrice() != null ? b.getHighPrice().doubleValue() : null,
+        b.getLowPrice() != null ? b.getLowPrice().doubleValue() : null,
+        b.getClosePrice() != null ? b.getClosePrice().doubleValue() : null,
+        b.getVolume() != null ? b.getVolume().doubleValue() : null);
   }
 
   public static void checkOrder(BarSeries bs) {

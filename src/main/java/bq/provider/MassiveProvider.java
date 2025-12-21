@@ -92,7 +92,7 @@ public class MassiveProvider extends DataProvider {
             .toLocalDate();
 
     ;
-    return BasicOHLCV.of(
+    return BasicOHLCV.ofDecimal(
         d,
         (BigDecimal) n.path("o").asDecimalOpt().orElse(null),
         (BigDecimal) n.path("h").asDecimalOpt().orElse(null),

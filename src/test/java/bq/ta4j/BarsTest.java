@@ -80,11 +80,11 @@ public class BarsTest extends BqTest {
             "list.add( BasicOHLCV.of( %s, %s, %s, %s, %s, %s));",
             String.format(
                 "LocalDate.of(%s,%s,%s)", d.getYear(), d.getMonthValue(), d.getDayOfMonth()),
-            it.getOpenAsDouble().get(),
-            it.getHighAsDouble().get(),
-            it.getLowAsDouble().get(),
-            it.getCloseAsDouble().get(),
-            it.getVolumeAsDouble().get());
+            it.getOpen().get(),
+            it.getHigh().get(),
+            it.getLow().get(),
+            it.getClose().get(),
+            it.getVolume().get());
 
     return s;
   }
@@ -120,15 +120,15 @@ public class BarsTest extends BqTest {
               Assertions.assertThat(bar.getEndTime().toString())
                   .startsWith(ohlcv.getDate().plusDays(1).toString());
               Assertions.assertThat(bar.getOpenPrice().doubleValue())
-                  .isEqualTo(ohlcv.getOpenAsDouble().get());
+                  .isEqualTo(ohlcv.getOpen().get());
               Assertions.assertThat(bar.getHighPrice().doubleValue())
-                  .isEqualTo(ohlcv.getHighAsDouble().get());
+                  .isEqualTo(ohlcv.getHigh().get());
               Assertions.assertThat(bar.getLowPrice().doubleValue())
-                  .isEqualTo(ohlcv.getLowAsDouble().get());
+                  .isEqualTo(ohlcv.getLow().get());
               Assertions.assertThat(bar.getClosePrice().doubleValue())
-                  .isEqualTo(ohlcv.getCloseAsDouble().get());
+                  .isEqualTo(ohlcv.getClose().get());
               Assertions.assertThat(bar.getVolume().doubleValue())
-                  .isEqualTo(ohlcv.getVolumeAsDouble().get());
+                  .isEqualTo(ohlcv.getVolume().get());
             });
   }
 

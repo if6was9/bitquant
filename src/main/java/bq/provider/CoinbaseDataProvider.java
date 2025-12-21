@@ -97,7 +97,7 @@ public class CoinbaseDataProvider extends DataProvider {
     Instant ts = Instant.ofEpochSecond(n.path("start").asLong());
 
     var candle =
-        BasicOHLCV.of(
+        BasicOHLCV.ofDecimal(
             ts,
             getBigDecimal(n, "open").orElse(null),
             getBigDecimal(n, "high").orElse(null),

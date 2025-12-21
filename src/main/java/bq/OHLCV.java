@@ -11,50 +11,25 @@ public interface OHLCV extends Comparable {
 
   Instant getTimestamp();
 
-  Optional<BigDecimal> getOpen();
+  public Optional<BigDecimal> getOpenAsDecimal();
 
-  Optional<BigDecimal> getHigh();
+  public Optional<BigDecimal> getHighAsDecimal();
 
-  Optional<BigDecimal> getLow();
+  public Optional<BigDecimal> getLowAsDecimal();
 
-  Optional<BigDecimal> getClose();
+  public Optional<BigDecimal> getCloseAsDecimal();
 
-  Optional<BigDecimal> getVolume();
+  public Optional<BigDecimal> getVolumeAsDecimal();
 
   Optional<Long> getId();
 
-  default Optional<Double> optDouble(Optional<BigDecimal> bd) {
-    if (bd == null) {
-      return Optional.empty();
-    }
-    if (bd.isPresent()) {
-      return Optional.of(bd.get().doubleValue());
-    }
-    return Optional.empty();
-  }
+  public Optional<Double> getOpen();
 
-  public default Optional<Double> getOpenAsDouble() {
+  public Optional<Double> getHigh();
 
-    return optDouble(getOpen());
-  }
+  public Optional<Double> getLow();
 
-  public default Optional<Double> getHighAsDouble() {
+  public Optional<Double> getClose();
 
-    return optDouble(getHigh());
-  }
-
-  public default Optional<Double> getLowAsDouble() {
-
-    return optDouble(getLow());
-  }
-
-  public default Optional<Double> getCloseAsDouble() {
-
-    return optDouble(getClose());
-  }
-
-  public default Optional<Double> getVolumeAsDouble() {
-
-    return optDouble(getVolume());
-  }
+  public Optional<Double> getVolume();
 }
