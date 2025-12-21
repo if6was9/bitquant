@@ -1,14 +1,24 @@
 package bq;
 
+import bq.ta4j.BarSeriesIterator;
 import bq.ta4j.Bars;
+import bq.ta4j.IndexedBar;
 import bx.sql.Results;
 import bx.sql.duckdb.DuckTable;
 import bx.util.Dates;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Iterator;
+import java.util.function.Function;
+
 import org.springframework.jdbc.core.RowMapper;
+import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
+import org.ta4j.core.Indicator;
+import org.ta4j.core.indicators.averages.SMAIndicator;
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.ta4j.core.num.Num;
 
 public class PriceTable {
 
@@ -58,5 +68,35 @@ public class PriceTable {
     var rows = table.select(sql).query(new OHLCVRowMapper()).list();
 
     return Bars.toBarSeries(rows.stream());
+  }
+  
+  IndicatorBuilder indicatorBuilder = new IndicatorBuilder();
+  public void addIndicator(String col, String expression) {
+	 addIndicator(col, bs->{
+		 return indicatorBuilder.create(expression, bs);
+	 });
+  }
+  public void addIndicator(String col, Function<BarSeries, Indicator> fn) {
+	BarSeries bs = loadBarSeries();
+	Indicator<Num> ind = fn.apply(bs);
+	
+	BarSeriesIterator t = Bars.toIterator(bs);
+	
+	table.addColumn(col+ " double");
+	while (t.hasNext()) {
+		IndexedBar b = (IndexedBar) t.next();
+		Num num = ind.getValue(t.getBarIndex());
+
+		double val = num.doubleValue();
+		if (num==null || num.isNaN()) {
+			table.update(b.getId(), col, null);
+		}
+		else {
+			table.update(b.getId(), col,val);
+		}
+		
+		
+		
+	}
   }
 }
