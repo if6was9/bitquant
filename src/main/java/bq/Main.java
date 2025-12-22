@@ -2,6 +2,7 @@ package bq;
 
 import bx.util.Slogger;
 import java.util.Map;
+import jdk.jshell.JShellConsole;
 import org.slf4j.Logger;
 
 public class Main {
@@ -10,5 +11,8 @@ public class Main {
 
   static ThreadLocal<Map<String, Object>> threadLocal = new ThreadLocal<Map<String, Object>>();
 
-  public static void main(String[] args) throws Exception {}
+  public static void main(String[] args) throws Exception {
+
+    JShellConsole x;
+  }
 }
