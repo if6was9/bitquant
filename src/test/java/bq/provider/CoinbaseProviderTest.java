@@ -2,20 +2,27 @@ package bq.provider;
 
 import bq.BqTest;
 import bq.ta4j.Bars;
+import bx.util.Slogger;
 import bx.util.Zones;
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+
+import com.google.common.base.Stopwatch;
 
 public class CoinbaseProviderTest extends BqTest {
 
+	Logger logger = Slogger.forEnclosingClass();
   @Test
   public void testX() {
     CoinbaseDataProvider cb = new CoinbaseDataProvider();
 
     var t =
         cb.dataSource(getDataSource())
-            .forSymbol("btc")
+            .newRequest("btc")
             .from(LocalDate.of(2025, 12, 1))
             .to(LocalDate.of(2025, 12, 7));
 
@@ -37,7 +44,7 @@ public class CoinbaseProviderTest extends BqTest {
     CoinbaseDataProvider cb = new CoinbaseDataProvider();
     var t =
         cb.dataSource(getDataSource())
-            .forSymbol("btc")
+            .newRequest("btc")
             .from(LocalDate.of(2017, 12, 1))
             .to(LocalDate.of(2025, 12, 7))
             .fetchIntoTable();
@@ -52,7 +59,7 @@ public class CoinbaseProviderTest extends BqTest {
 
     var t =
         cb.dataSource(getDataSource())
-            .forSymbol("btc")
+            .newRequest("btc")
             .from(LocalDate.of(2017, 12, 1))
             .to(LocalDate.of(2025, 12, 7))
             .fetchIntoTable();
@@ -67,7 +74,7 @@ public class CoinbaseProviderTest extends BqTest {
     var t =
         new CoinbaseDataProvider()
             .dataSource(getDataSource())
-            .forSymbol("btc")
+            .newRequest("btc")
             .from(LocalDate.of(2025, 12, 1))
             .fetchIntoTable("test");
 
@@ -81,7 +88,7 @@ public class CoinbaseProviderTest extends BqTest {
     var t =
         new CoinbaseDataProvider()
             .dataSource(getDataSource())
-            .forSymbol("btc")
+            .newRequest("btc")
             .from(LocalDate.of(2025, 12, 1))
             .fetchIntoTable();
 
@@ -93,7 +100,7 @@ public class CoinbaseProviderTest extends BqTest {
     CoinbaseDataProvider cb = new CoinbaseDataProvider();
 
     var candles =
-        cb.forSymbol("btc")
+        cb.newRequest("btc")
             .from(LocalDate.now(Zones.UTC).minusDays(3))
             .to(null)
             .fetchStream()
@@ -117,7 +124,7 @@ public class CoinbaseProviderTest extends BqTest {
     CoinbaseDataProvider cb = new CoinbaseDataProvider();
 
     var list =
-        cb.forSymbol("btc")
+        cb.newRequest("btc")
             .from(LocalDate.of(2025, 12, 1))
             .to(LocalDate.of(2025, 12, 1))
             .fetchStream()
@@ -146,10 +153,35 @@ public class CoinbaseProviderTest extends BqTest {
     Assertions.assertThat(CoinbaseDataProvider.toCoinbaseSymbol("ETH/EUR")).isEqualTo("ETH-EUR");
   }
 
+  
+  @Test
+  public void testCache() {
+	  var cb = new CoinbaseDataProvider();
+	  cb.invalidateAll();
+	  
+	  Stopwatch sw = Stopwatch.createStarted();
+	  cb.newRequest("btc").from(2020, 1, 1).fetchStream().forEach(it->{});
+	  long uncachedMs = sw.elapsed(TimeUnit.MILLISECONDS);
+	  
+	  logger.atInfo().log("uncached {}ms",uncachedMs);
+	  
+	  sw = Stopwatch.createStarted();
+	  cb.newRequest("btc").from(2020, 1, 1).fetchStream().forEach(it->{});
+	  long cachedMs = sw.elapsed(TimeUnit.MILLISECONDS);
+	  
+	  logger.atInfo().log("cached {}ms",cachedMs);
+	  
+	  double speedup = ((double)uncachedMs) / ((cachedMs>0) ? cachedMs : 1);
+	  
+	  logger.atInfo().log("cache speedup: {}x",speedup);
+	  
+	  Assertions.assertThat(speedup).withFailMessage("cache speedup should be >10x").isGreaterThan(10);
+	  
+  }
   @Test
   public void testDaysAgo() {
     new CoinbaseDataProvider()
-        .forSymbol("btc")
+        .newRequest("btc")
         .fromDaysAgo(3)
         .fetchStream()
         .forEach(

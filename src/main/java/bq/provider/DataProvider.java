@@ -41,6 +41,18 @@ public abstract class DataProvider {
       return to(LocalDate.now(Zones.UTC).minusDays(count));
     }
 
+    public Request notBefore(LocalDate d) {
+    	return from(d);
+    }
+    public Request notBefore(int y, int m, int d) {
+    	return from(y,m,d);
+    }
+    public Request notAfter(LocalDate d) {
+    	return from(d);
+    }
+    public Request notAfter(int y, int m, int d) {
+    	return from(y,m,d);
+    }
     public Request from(int year, int month, int day) {
       return from(LocalDate.of(year, month, day));
     }
@@ -109,13 +121,13 @@ public abstract class DataProvider {
     return (T) this;
   }
 
-  public Request forSymbol(String symbol) {
+  
+  public Request newRequest(String symbol) {
     return newRequest().symbol(symbol);
   }
 
-  private Request newRequest() {
+  public Request newRequest() {
     Request r = new Request();
-
     return r;
   }
 

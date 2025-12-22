@@ -96,7 +96,7 @@ public class BarsTest extends BqTest {
     // This will fetch some sample data that can be pasted back into test method
 
     new MassiveProvider()
-        .forSymbol("GOOG")
+        .newRequest("GOOG")
         .from(LocalDate.of(2025, 1, 1))
         .to(LocalDate.of(2025, 3, 30))
         .fetchStream()

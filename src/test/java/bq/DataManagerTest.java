@@ -32,7 +32,7 @@ public class DataManagerTest extends BqTest {
 
     var list =
         new CoinbaseDataProvider()
-            .forSymbol("btc")
+            .newRequest("btc")
             .from(LocalDate.of(2025, 1, 28))
             .fetchStream()
             .toList();

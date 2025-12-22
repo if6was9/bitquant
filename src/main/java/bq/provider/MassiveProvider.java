@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.MissingNode;
 
-public class MassiveProvider extends DataProvider {
+public class MassiveProvider extends CachingDataProvider {
 
   static Logger logger = Slogger.forEnclosingClass();
 
@@ -62,6 +62,11 @@ public class MassiveProvider extends DataProvider {
 
     logger.atInfo().log("GET {}", url);
 
+    JsonNode body=null;
+    body = getCachedJson(url).orElse(null);
+    
+   
+    if (body==null) {
     kong.unirest.core.HttpResponse<tools.jackson.databind.JsonNode> response =
         Unirest.get(url)
             .headerReplace("Accept", "application/json")
@@ -79,7 +84,9 @@ public class MassiveProvider extends DataProvider {
       throw new BxException(msg);
     }
 
-    JsonNode body = response.getBody();
+     body = response.getBody();
+     putCache(url, body);
+    }
 
     // timestamps from massive for daily aggregates use 00:00 NYC as the start period
     return Json.asStream(body.path("results")).map(this::toOHLCV);
