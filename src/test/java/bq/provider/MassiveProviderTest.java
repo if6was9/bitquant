@@ -14,7 +14,6 @@ public class MassiveProviderTest extends BqTest {
 
   static Logger logger = Slogger.forEnclosingClass();
 
-  
   @Test
   public void testRequestDefault() {
     var cb = new CoinbaseDataProvider();
@@ -23,6 +22,7 @@ public class MassiveProviderTest extends BqTest {
     Assertions.assertThat(cb.newRequest().getFrom().isPresent()).isFalse();
     Assertions.assertThat(cb.newRequest().getTo().isPresent()).isFalse();
   }
+
   @Test
   public void testIt() {
 

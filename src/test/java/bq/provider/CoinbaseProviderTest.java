@@ -176,7 +176,6 @@ public class CoinbaseProviderTest extends BqTest {
     var candles =
         cb.newRequest("btc")
             .from(LocalDate.now(Zones.UTC).minusDays(3))
-        
             .includeUnclosedPeriod(true) // explicitly set
             .fetchStream()
             .toList();
@@ -196,14 +195,9 @@ public class CoinbaseProviderTest extends BqTest {
     Assertions.assertThat(candles.get(3).getDate())
         .isEqualTo(LocalDate.now(Zones.UTC).minusDays(0));
 
-    
     // now do it again and see that the result is the same
     candles =
-        cb.newRequest("btc")
-            .from(LocalDate.now(Zones.UTC).minusDays(3))
-           
-            .fetchStream()
-            .toList();
+        cb.newRequest("btc").from(LocalDate.now(Zones.UTC).minusDays(3)).fetchStream().toList();
 
     candles.forEach(
         it -> {
