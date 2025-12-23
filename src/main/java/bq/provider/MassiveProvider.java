@@ -55,7 +55,7 @@ public class MassiveProvider extends CachingDataProvider {
       from = request.from.toString();
     }
     if (request.to == null) {
-      to = LocalDate.now(Zones.NYC).toString();
+      to = LocalDate.now(Zones.UTC).toString();
     } else {
       to = request.to.toString();
     }
@@ -115,7 +115,7 @@ public class MassiveProvider extends CachingDataProvider {
   OHLCV toOHLCV(JsonNode n) {
 
     var d =
-        ZonedDateTime.ofInstant(Instant.ofEpochMilli(n.path("t").asLong()), Zones.NYC)
+        ZonedDateTime.ofInstant(Instant.ofEpochMilli(n.path("t").asLong()), Zones.UTC)
             .toLocalDate();
 
     ;
