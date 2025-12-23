@@ -28,7 +28,7 @@ public class DataManagerTest extends BqTest {
   @Test
   public void testIt2() {
 
-    var table = loadBtcPriceData("btc");
+    var table = getTestData().getDataManager().createOHLCV("btc", true);
 
     var list =
         new CoinbaseDataProvider()
