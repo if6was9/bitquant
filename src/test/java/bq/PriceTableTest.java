@@ -10,7 +10,7 @@ public class PriceTableTest extends BqTest {
   @Test
   public void testIt() {
 
-    PriceTable pt = PriceTable.from(loadBtcPriceData("btc"));
+    PriceTable pt = PriceTable.from(getTestData().loadBtcPriceData("btc"));
 
     // pt.getDuckTable().getJdbcClient().sql("delete from btc where date<'2025-01-15'").update();
     Assertions.assertThat(pt.getDuckTable()).isNotNull();

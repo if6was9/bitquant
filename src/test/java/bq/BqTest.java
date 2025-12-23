@@ -3,11 +3,9 @@ package bq;
 import bq.chart.Chart;
 import bx.sql.PrettyQuery;
 import bx.sql.duckdb.DuckDataSource;
-import bx.sql.duckdb.DuckTable;
 import bx.util.S;
 import bx.util.Slogger;
 import com.google.common.base.Preconditions;
-import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,22 +41,6 @@ public abstract class BqTest {
   public PrettyQuery prettyQuery() {
 
     return PrettyQuery.with(getDataSource()).out(logger, Level.INFO);
-  }
-
-  public DuckTable loadBtcPriceData(String table) {
-
-    getDuckDataManager().createOHLCV(table, true);
-    String sql =
-        String.format(
-            "insert into %s (date, open, high,low,close,volume) (select"
-                + " date,open,high,low,close,volume from '%s' order by date)",
-            table, new File("src/test/resources/btc-price-data.csv").toString());
-
-    int count = getJdbcClient().sql(sql).update();
-
-    logger.atDebug().log("inserted {} rows", count);
-
-    return DuckTable.of(getDataSource(), table);
   }
 
   @BeforeEach
@@ -163,8 +145,10 @@ public abstract class BqTest {
   @BeforeEach
   void disableDesktopIfMultipleTetsAreRun() {
 
-    // It is nice to be able to open a chart from a unit test.  However, when running a whole suite,
-    // it is annoying to have a bunch of browser tabs/windows open. So what we do here is disable
+    // It is nice to be able to open a chart from a unit test. However, when running
+    // a whole suite,
+    // it is annoying to have a bunch of browser tabs/windows open. So what we do
+    // here is disable
     // the
     // browser open if we have more than one test run.
     //
@@ -175,9 +159,17 @@ public abstract class BqTest {
     }
   }
 
+  public TestData getTestData() {
+    TestData testData = new TestData(getDataSource());
+    return testData;
+  }
+
   @AfterEach
   public void tearDown() {
-    logger.atTrace().log("closing: " + dataSource);
-    dataSource.close();
+    if (dataSource != null) {
+      logger.atTrace().log("closing: " + dataSource);
+      dataSource.close();
+      dataSource = null;
+    }
   }
 }
