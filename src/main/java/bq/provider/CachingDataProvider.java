@@ -23,7 +23,7 @@ public abstract class CachingDataProvider extends DataProvider {
     super();
     cacheDir.mkdirs();
 
-    logger.atInfo().log("cache dir: {}", cacheDir);
+    logger.atDebug().log("cache dir: {}", cacheDir);
   }
 
   public void invalidateAll() {
