@@ -107,7 +107,7 @@ public class BtcPowerLawCalculator {
   private static void calibrateQuantile(
       BarSeries data, double a, QuantileModel model, double step) {
 
-    logger.atDebug().log("calibrate a=%s step=%s", a, step);
+    logger.atDebug().log("calibrate a={} step={}", a, step);
 
     Preconditions.checkArgument(model.quantiles.size() == 100);
     Preconditions.checkArgument(a >= 2 && a < 10, "a must be in range [2,10] was %s", a);
@@ -149,7 +149,7 @@ public class BtcPowerLawCalculator {
       if (q < 100) {
         if (model.quantiles.get(q) == null) {
           double qv = new BigDecimal(c).setScale(3, RoundingMode.HALF_UP).doubleValue();
-          logger.atDebug().log("q[%s]=%s", q, qv);
+          logger.atDebug().log("q[{}]={}", q, qv);
           model.quantiles.set(q, qv);
         }
       }

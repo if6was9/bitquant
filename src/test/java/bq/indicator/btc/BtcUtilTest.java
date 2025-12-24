@@ -35,7 +35,7 @@ public class BtcUtilTest {
     for (int epoch = 1; epoch < 10; epoch++) {
 
       LocalDate startOfEpoch = BtcUtil.getStartOfEpoch(epoch);
-      logger.atDebug().log("testing epoch=%s start=%s", epoch, startOfEpoch);
+      logger.atDebug().log("testing epoch={} start={}", epoch, startOfEpoch);
 
       Assertions.assertThat(BtcUtil.getDayOfEpoch(BtcUtil.GENESIS_DATE)).isEqualTo(0);
       for (int i = 0; i < 2000; i++) {
@@ -117,7 +117,7 @@ public class BtcUtilTest {
     Assertions.assertThat(BtcUtil.getBlockReward(-1)).isEqualByComparingTo("0");
 
     for (int i = 1; i < 15; i++) {
-      logger.atInfo().log("epoch=%s reward=%s", i, BtcUtil.getBlockReward(i));
+      logger.atInfo().log("epoch={} reward={}", i, BtcUtil.getBlockReward(i));
     }
 
     Assertions.assertThat(BtcUtil.getBlockReward(LocalDate.now())).isEqualByComparingTo("3.125");
