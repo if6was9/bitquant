@@ -1,0 +1,61 @@
+package bq.util;
+
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import org.junit.jupiter.api.Test;
+
+public class ScriptTest {
+
+  @Test
+  public void testIt() {
+
+    try {
+      ScriptEngineManager manager = new ScriptEngineManager();
+      ScriptEngine engine = manager.getEngineByName("java");
+
+      String script =
+          """
+            public class Script {
+                public String getMessage() {
+                	return "Hello World";
+                }
+            }
+
+          """;
+      Object result = engine.eval(script);
+      System.out.println("Result: " + result);
+    } catch (ScriptException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  public void testCompile() {
+
+    try {
+      ScriptEngineManager manager = new ScriptEngineManager();
+      ScriptEngine engine = manager.getEngineByName("java");
+
+      Compilable compiler = (Compilable) engine;
+
+      String script =
+          """
+            public class Script {
+                public String getMessage() {
+                	return "Hello World";
+                }
+            }
+
+          """;
+
+      CompiledScript compiledScript = compiler.compile(script);
+      Object result = compiledScript.eval();
+      System.out.println("Result: " + result);
+    } catch (ScriptException e) {
+      e.printStackTrace();
+    }
+  }
+}
