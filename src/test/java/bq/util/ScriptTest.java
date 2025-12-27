@@ -1,5 +1,6 @@
 package bq.util;
 
+import bq.BqTest;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -9,7 +10,7 @@ import javax.script.ScriptException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ScriptTest {
+public class ScriptTest extends BqTest {
 
   @Test
   public void testIt() {

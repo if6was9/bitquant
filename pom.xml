@@ -2,6 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.1</version>
+		<relativePath/> 
+	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>bq</groupId>
@@ -25,14 +32,24 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>21</maven.compiler.release>
+ 
+
+
+    <spring-shell.version>4.0.0-RC1</spring-shell.version>
+ 
 	</properties>
 	<dependencies>
 
 
+<dependency>
+    <groupId>org.springframework.shell</groupId>
+	<artifactId>spring-shell-jline</artifactId>
+	<version>${spring-shell.version}</version>
+</dependency>
+
 		<dependency>
 			<groupId>io.github.if6was9</groupId>
 			<artifactId>bx</artifactId>
-
 			<version>0.2.0</version>
 		</dependency>
 		<dependency>
@@ -41,11 +58,11 @@
 			<version>4.8.184</version>
 
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.5.23</version>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>org.duckdb</groupId>
@@ -74,6 +91,8 @@
     <artifactId>java-scriptengine</artifactId>
     <version>2.0.0</version>
 </dependency>
+
+<!--
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
@@ -84,6 +103,17 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>6.0.1</version>
+			<scope>test</scope>
+		</dependency>-->
+
+				<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -98,17 +128,19 @@
 
 	<build>
 		<plugins>
-
-
+	
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.5.4</version>
-				<configuration>
-
-				</configuration>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
+	
+ <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+            </configuration>
+        </plugin>
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
@@ -149,26 +181,7 @@
 					</java>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.6.3</version> <!-- Use the latest stable version -->
-				<executions>
-					<execution>
-						<goals>
-							<goal>java</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<mainClass>bq.Main</mainClass>
-
-					<arguments>
-						<!--  <argument>arg1</argument>
-                        <argument>arg2</argument>-->
-					</arguments>
-				</configuration>
-			</plugin>
+	
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -233,6 +246,19 @@
             </plugins>
 </pluginManagement>
 
+
 	</build>
 
+	<!--
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-dependencies</artifactId>
+            <version>${spring-shell.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>-->
 </project>

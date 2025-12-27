@@ -34,3 +34,6 @@ build/
 
 /config.yml
 /btc-power-law-model.json
+
+
+spring-shell.log
