@@ -5,6 +5,7 @@ import bq.OHLCV;
 import bx.util.Item;
 import bx.util.Iterators;
 import bx.util.Zones;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import java.time.Duration;
 import java.time.Instant;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.ta4j.core.Bar;
@@ -38,6 +40,26 @@ public class Bars {
 
       return o1.getBeginTime().compareTo(o2.getBeginTime());
     }
+  }
+
+  public static String toString(BarSeries b) {
+
+    if (b == null) {
+      return Objects.toString(null);
+    }
+    Instant from = null;
+    Instant to = null;
+    if (b.getFirstBar() != null) {
+      from = b.getFirstBar().getBeginTime();
+      to = b.getLastBar().getEndTime();
+    }
+
+    int count = b.getBarCount();
+    return MoreObjects.toStringHelper(BarSeries.class)
+        .add("begin", b.getFirstBar().getBeginTime())
+        .add("end", to)
+        .add("count", b.getBarCount())
+        .toString();
   }
 
   public static BarSeries toBarSeries(Stream<OHLCV> stream) {
@@ -131,9 +153,10 @@ public class Bars {
   }
 
   /**
-   * TA4J BarSeries indexes are unusual *AND* necessary to use indicators.
-   * Using the Item<Bar> construct makes it easy to iterate across a bar series and,
-   * for example, get Indicator values.
+   * TA4J BarSeries indexes are unusual *AND* necessary to use indicators. Using
+   * the Item<Bar> construct makes it easy to iterate across a bar series and, for
+   * example, get Indicator values.
+   *
    * @param barSeries
    * @return
    */

@@ -34,7 +34,7 @@ public class DataManager {
     return JdbcClient.create(this.dataSource);
   }
 
-  public DuckTable createOHLCV(String table, boolean withConstraint) {
+  public PriceTable createOHLCV(String table, boolean withConstraint) {
     String sql =
         """
 CREATE TABLE %s (
@@ -54,7 +54,7 @@ CREATE TABLE %s (
       addOHLCVPrimaryKey(table);
     }
 
-    return DuckTable.of(this.dataSource, table);
+    return new PriceTable(getDataSource(), table);
   }
 
   public DataSource getDataSource() {

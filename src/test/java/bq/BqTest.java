@@ -57,7 +57,7 @@ public abstract class BqTest {
     logger.atTrace().log("setup");
     dataSource = DuckDataSource.createInMemory();
 
-    DataProviders.setDataSource(dataSource);
+    DataProviders.get().dataSource(dataSource);
     ddm = new DataManager();
     ddm.dataSource(dataSource);
   }

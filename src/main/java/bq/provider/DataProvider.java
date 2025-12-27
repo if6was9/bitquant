@@ -35,6 +35,10 @@ public abstract class DataProvider {
       return this;
     }
 
+    public DataSource getDataSource() {
+      return DataProvider.this.getDataSource();
+    }
+
     public boolean isUnclosedPeriodIncluded() {
       return includeUnclosedPeriod;
     }
@@ -115,20 +119,23 @@ public abstract class DataProvider {
 
       Preconditions.checkState(dataSource != null, "DataSource must be set");
 
-      DataManager ddm = new DataManager().dataSource(dataSource);
-
-      var table = ddm.createOHLCV(tableName, true);
-
-      return fetchIntoTable(table.getTableName());
+      return fetchIntoTable(tableName);
     }
 
     public PriceTable fetchIntoTable(String table) {
-      return fetchIntoTable(table, false);
+      return fetchIntoTable(table, true);
     }
 
     public PriceTable fetchIntoTable(String table, boolean create) {
       Preconditions.checkState(DataProvider.this.dataSource != null, "dataSource must be set");
       DataManager ddm = new DataManager().dataSource(dataSource);
+
+      var t = PriceTable.from(dataSource, table);
+      if (create) {
+        if (!t.exists()) {
+          ddm.createOHLCV(table, true);
+        }
+      }
       ddm.insert(table, fetchStream().toList());
       return PriceTable.from(dataSource, table);
     }

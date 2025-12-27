@@ -13,8 +13,6 @@ public class TestDataTest extends BqTest {
 
   @Test
   public void testX() {
-    var list = DataProviders.forSymbol("wgmi").fetchStream().toList();
-
-    System.out.println(list.size());
+    DataProviders.forSymbol("wgmi");
   }
 }

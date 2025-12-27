@@ -8,6 +8,7 @@ import bq.ta4j.IndicatorBuilder;
 import bx.sql.Results;
 import bx.sql.duckdb.DuckTable;
 import bx.util.Dates;
+import com.google.common.base.Preconditions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -120,6 +121,12 @@ public class PriceTable extends DuckTable {
   public Indicator<Num> getColumnIndicator(String col) {
 
     return new DuckColumnIndicator(this, col);
+  }
+
+  public int insertMissing(PriceTable other) {
+    Preconditions.checkState(this.getDataSource() == other.getDataSource());
+    var dm = new DataManager().dataSource(getDataSource());
+    return dm.mergeMissing(getTableName(), other.getName());
   }
 
   public void addIndicator(String col, Function<BarSeries, Indicator<Num>> fn) {
