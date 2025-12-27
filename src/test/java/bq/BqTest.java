@@ -16,8 +16,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
+@SpringBootTest
 public abstract class BqTest {
 
   static Logger logger = Slogger.forEnclosingClass();
@@ -57,7 +59,7 @@ public abstract class BqTest {
     logger.atTrace().log("setup");
     dataSource = DuckDataSource.createInMemory();
 
-    DataProviders.setDataSource(dataSource);
+    DataProviders.get().dataSource(dataSource);
     ddm = new DataManager();
     ddm.dataSource(dataSource);
   }

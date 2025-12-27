@@ -5,9 +5,6 @@ import javax.sql.DataSource;
 
 public class DataProviders {
 
-  DataProvider stockProvider = new MassiveProvider();
-  DataProvider cryptoProvider = new CoinbaseDataProvider();
-
   private static DataProviders instance = new DataProviders();
   private DataSource dataSource;
 
@@ -20,27 +17,36 @@ public class DataProviders {
     return cryptoSymbols.contains(s.toUpperCase().trim());
   }
 
-  public static void setDataSource(DataSource dataSource) {
-    instance.dataSource = dataSource;
+  public static DataProviders get() {
+    return instance;
   }
 
-  public static DataProvider.Request forSymbol(String symbol) {
-    return findProviderForSymbol(symbol).newRequest(symbol);
+  public DataProviders dataSource(DataSource ds) {
+    this.dataSource = ds;
+    return this;
   }
 
-  public static DataProvider findProviderForSymbol(String symbol) {
+  public DataSource getDataSource() {
+    return dataSource;
+  }
 
-    DataProvider p = null;
-    if (instance.isCrypto(symbol)) {
-      p = instance.cryptoProvider;
-    } else {
-      p = instance.stockProvider;
+  public DataProvider getDataProviderForSymbol(String symbol) {
+    if (isCrypto(symbol)) {
+      return new CoinbaseDataProvider().dataSource(instance.dataSource);
     }
-    if (p != null) {
-      if (p.getDataSource() == null) {
-        p.dataSource = instance.dataSource;
-      }
-    }
-    return p;
+    return new MassiveProvider().dataSource(instance.dataSource);
+  }
+
+  public static DataProvider forSymbol(String symbol) {
+
+    return get().getDataProviderForSymbol(symbol);
+  }
+
+  public static DataProvider.Request newRequest(String symbol) {
+    return get().newRequestForSymbol(symbol);
+  }
+
+  public DataProvider.Request newRequestForSymbol(String symbol) {
+    return getDataProviderForSymbol(symbol).newRequest(symbol);
   }
 }
